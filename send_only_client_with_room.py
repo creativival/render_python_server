@@ -20,7 +20,7 @@ jsonString = f"""
 }}
 """
 async def sender(room_name):
-    async with websockets.connect('wss://render-nodejs-server.onrender.com') as websocket:
+    async with websockets.connect('ws://localhost:8765') as websocket:
         # First, join the room
         await websocket.send(room_name)
         print(f"Joined room: {room_name}")
