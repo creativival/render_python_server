@@ -91,10 +91,10 @@ def draw_square(build_box, w, d, h, r, g, b):
 
 
 def main():
-  room_name = "8914"
+  room_name = "1000"
   build_box = BuildBox(room_name)
   build_box.set_box_size(0.3)
-  build_box.set_build_interval(0.01)
+  build_box.set_build_interval(0.001)
 
   for key in castle:
     color = castle[key]["color"]
