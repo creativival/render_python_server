@@ -1,7 +1,7 @@
 from time import sleep
 from build_box import BuildBox
 
-room_name = "6420"
+room_name = "1000"
 build_box = BuildBox(room_name)
 
 build_box.set_box_size(0.3)

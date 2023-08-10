@@ -17,6 +17,8 @@ class BuildBox:
     self.commands = []
     self.size = 1
     self.shape = 'box'
+    self.is_metallic = 0
+    self.roughness = 0.5
     self.build_interval = 0.01
 
   def animate_global(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
@@ -60,6 +62,8 @@ class BuildBox:
     self.commands = []
     self.size = 1
     self.shape = 'box'
+    self.is_metallic = 0
+    self.roughness = 0.5
     self.build_interval = 0.01
 
   def write_sentence(self, sentence, x, y, z, r=1, g=1, b=1, alpha=1):
@@ -67,9 +71,17 @@ class BuildBox:
     r, g, b, alpha = map(str, [r, g, b, alpha])
     self.sentence = [sentence, x, y, z, r, g, b, alpha]
 
-  def set_light(self, x, y, z, r=1, g=1, b=1, alpha=1, intensity=1000, interval=1):
+  def set_light(self, x, y, z, r=1, g=1, b=1, alpha=1, intensity=1000, interval=1, light_type='point'):
     x, y, z = map(floor, [x, y, z])
-    self.lights.append([x, y, z, r, g, b, alpha, intensity, interval])
+    if light_type == 'point':
+      light_type = 1
+    elif light_type == 'spot':
+      light_type = 2
+    elif light_type == 'directional':
+      light_type = 3
+    else:
+      light_type = 1
+    self.lights.append([x, y, z, r, g, b, alpha, intensity, interval, light_type])
 
   def set_command(self, command):
     self.commands.append(command)
@@ -123,6 +135,13 @@ class BuildBox:
   def change_shape(self, shape):
     self.shape = shape
 
+  def change_material(self, is_metallic=False, roughness=0.5):
+    if is_metallic:
+      self.is_metallic = 1
+    else:
+      self.is_metallic = 0
+    self.roughness = roughness
+
   def send_data(self):
     now = datetime.datetime.now()
     data_to_send = f"""
@@ -137,6 +156,8 @@ class BuildBox:
       "size": {self.size},
       "shape": "{self.shape}",
       "interval": {self.build_interval},
+      "isMetallic": {self.is_metallic},
+      "roughness": {self.roughness},
       "date": "{now}"
       }}
       """.replace("'", '"')
