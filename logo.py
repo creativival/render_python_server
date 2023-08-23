@@ -3,7 +3,7 @@ from build_box import BuildBox
 room_name = "1000"
 build_box = BuildBox(room_name)
 
-build_box.set_box_size(1)
+build_box.set_box_size(5)
 build_box.set_build_interval(0.01)
 
 logo = [
@@ -41,4 +41,5 @@ for i in range(24):
         else:
             build_box.create_box(i - 12, 7 - j, 0, 0, 0, 0, 1)
 
+build_box.change_material(is_metallic=True, roughness=0)
 build_box.send_data()
