@@ -10,7 +10,7 @@ build_box.set_box_size(0.1)
 build_box.set_build_interval(0.01)
 
 # ノードの設定
-build_box.set_node(0, 0, 0, pitch=0, yaw=0, roll=0)
+build_box.translate(0, 0, 0, pitch=0, yaw=0, roll=0)
 
 # 円状のパターンを作成
 for degree in range(360):

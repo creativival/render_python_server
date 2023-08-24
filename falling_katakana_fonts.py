@@ -54,7 +54,7 @@ for _ in range(3):
     y = randint(0, 100)
     z = randint(-50, 0)
     yaw = degrees(atan2(x, 100 - z))
-    build_box.set_node(x, font_size * len(katakana_list) + y, z, pitch=0, yaw=yaw, roll=0)
+    build_box.translate(x, font_size * len(katakana_list) + y, z, pitch=0, yaw=yaw, roll=0)
     build_box.send_data()
     time.sleep(1)
 

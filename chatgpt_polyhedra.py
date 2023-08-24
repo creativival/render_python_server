@@ -20,8 +20,8 @@ for name, poly in polyhedra.items():
 
   # ノードの設定
   offset_x, offset_y, offset_z = offset[0] * size, offset[1] * size, offset[2] * size
-  build_box.set_node(offset_x, offset_y, offset_z, pitch=60, yaw=0, roll=0)
-  build_box.animate_node(0, 0, 0, pitch=0, yaw=180, roll=0, scale=1, interval=5)
+  build_box.translate(offset_x, offset_y, offset_z, pitch=60, yaw=0, roll=0)
+  build_box.animate(0, 0, 0, pitch=0, yaw=180, roll=0, scale=1, interval=5)
 
   for edge in edges:
     start, end = vertices[edge[0]], vertices[edge[1]]

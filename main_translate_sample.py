@@ -18,7 +18,7 @@ for i in range(5):
   build_box.remove_box(1, i * 2, 0)
 
 for i in range(5):
-  build_box.set_node(-25 + i * 10, 0, 0, pitch=0, yaw=0, roll=0)
+  build_box.translate(-25 + i * 10, 0, 0, pitch=0, yaw=0, roll=0)
 
   build_box.send_data()
   time.sleep(1)

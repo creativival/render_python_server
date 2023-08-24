@@ -50,7 +50,7 @@ for _ in range(3):
 
         build_box.set_box_size(0.5)
         build_box.set_build_interval(0)
-        build_box.set_node(*position)
+        build_box.translate(*position)
         build_box.send_data()
         sleep(0.5)
 

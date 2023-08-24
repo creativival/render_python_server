@@ -46,5 +46,5 @@ for j in range(repeat_count):
         color = [c / 255 for c in hue_circle_colors[angle_i // color_range]]
         build_box.draw_line(x1, y1, z1, x2, y2, z2, color[0], color[1], color[2], 1)
 
-build_box.set_node(0, 50, 0, pitch=0, yaw=0, roll=0)
+build_box.translate(0, 50, 0, pitch=0, yaw=0, roll=0)
 build_box.send_data()

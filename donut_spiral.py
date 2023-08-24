@@ -47,5 +47,5 @@ for i in range(repeat_count):
 
 for i in range(6):
     yaw = 15 * i
-    build_box.set_node(0, 50, 0, pitch=0, yaw=yaw, roll=0)
+    build_box.translate(0, 50, 0, pitch=0, yaw=yaw, roll=0)
     build_box.send_data()

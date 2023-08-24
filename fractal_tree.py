@@ -39,10 +39,10 @@ build_box.send_data()
 
 time.sleep(3)
 
-build_box.set_node(0, 0, 0, 0, 45, 0)
+build_box.translate(0, 0, 0, 0, 45, 0)
 build_box.send_data()
 
 time.sleep(3)
 
-build_box.set_node(0, 0, 0, 0, 90, 0)
+build_box.translate(0, 0, 0, 0, 90, 0)
 build_box.send_data()

@@ -20,28 +20,42 @@ class BuildBox:
     self.is_metallic = 0
     self.roughness = 0.5
     self.build_interval = 0.01
+    self.matrices = []
+    self.is_allowed_float = 0
+
+  def push_matrix(self):
+    self.matrices.append(self.node)
+
+  def pop_matrix(self):
+    self.node = self.matrices.pop()
 
   def animate_global(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
     self.clear_data()
     x, y, z = map(floor, [x, y, z])
     self.global_animation = [x, y, z, pitch, yaw, roll, scale, interval]
 
-  def set_node(self, x, y, z, pitch=0, yaw=0, roll=0):
+  def translate(self, x, y, z, pitch=0, yaw=0, roll=0):
     x, y, z = map(floor, [x, y, z])
     self.node = [x, y, z, pitch, yaw, roll]
 
-  def animate_node(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
+  def animate(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
     x, y, z = map(floor, [x, y, z])
     self.animation = [x, y, z, pitch, yaw, roll, scale, interval]
 
   def create_box(self, x, y, z, r=1, g=1, b=1, alpha=1):
-    x, y, z = map(floor, [x, y, z])
+    if self.is_allowed_float:
+      x, y, z = [round(val, 2) for val in [x, y, z]]
+    else:
+      x, y, z = map(floor, [x, y, z])
     # 重ねておくことを防止
     self.remove_box(x, y, z)
     self.boxes.append([x, y, z, r, g, b, alpha])
 
   def remove_box(self, x, y, z):
-    x, y, z = [floor(val) for val in [x, y, z]]
+    if self.is_allowed_float:
+      x, y, z = [round(val, 2) for val in [x, y, z]]
+    else:
+      x, y, z = map(floor, [x, y, z])
     for box in self.boxes:
       if box[0] == x and box[1] == y and box[2] == z:
         self.boxes.remove(box)
@@ -64,6 +78,7 @@ class BuildBox:
     self.shape = 'box'
     self.is_metallic = 0
     self.roughness = 0.5
+    self.is_allowed_float = 0
     self.build_interval = 0.01
 
   def write_sentence(self, sentence, x, y, z, r=1, g=1, b=1, alpha=1):
@@ -85,6 +100,9 @@ class BuildBox:
 
   def set_command(self, command):
     self.commands.append(command)
+      
+    if command == 'float':
+      self.is_allowed_float = 1
 
   def draw_line(self, x1, y1, z1, x2, y2, z2, r=1, g=1, b=1, alpha=1):
     x1, y1, z1 = map(floor, [x1, y1, z1])
@@ -158,6 +176,7 @@ class BuildBox:
       "interval": {self.build_interval},
       "isMetallic": {self.is_metallic},
       "roughness": {self.roughness},
+      "isAllowedFloat": {self.is_allowed_float},
       "date": "{now}"
       }}
       """.replace("'", '"')

@@ -28,11 +28,11 @@ for i, color in enumerate(colors):
 
 for i in range(5):
   build_box.change_material(is_metallic=False, roughness=0.25 * i)
-  build_box.set_node(i, 0, 0, pitch=0, yaw=0, roll=0)
+  build_box.translate(i, 0, 0, pitch=0, yaw=0, roll=0)
   build_box.send_data()
 
 
 for i in range(5):
   build_box.change_material(is_metallic=True, roughness=0.25 * i)
-  build_box.set_node(5 + i, 0, 0, pitch=0, yaw=0, roll=0)
+  build_box.translate(5 + i, 0, 0, pitch=0, yaw=0, roll=0)
   build_box.send_data()
