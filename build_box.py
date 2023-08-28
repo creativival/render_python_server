@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from math import floor
+import re
 
 import websockets
 
@@ -214,7 +215,7 @@ class BuildBox:
                 # print(f"Joined room: {room_name}")
                 await websocket.send(data_to_send)
                 # print(data_to_send)
-                # print(re.sub(r'\n      ', ' ', data_to_send.replace('"', '\\"')))
+                print(re.sub(r'\n      ', ' ', data_to_send.replace('"', '\\"')))
                 # print("Sent data to server")
                 # self.clear_data()
 

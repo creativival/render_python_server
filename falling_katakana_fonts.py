@@ -27,13 +27,15 @@ katakana_font_dict = get_katakana_font_dict(font_file)
 katakana_list = list(range(first_katakana_id, last_katakana_id + 1))
 shuffle(katakana_list)
 
-room_name = "2536"
+room_name = "3132"
 build_box = BuildBox(room_name)
 
 build_box.set_box_size(0.3)
 build_box.set_build_interval(0)
 
 for i in range(len(katakana_list)):
+    if randint(0, 10) < 1:  # 10%の確率でスキップ
+        continue
     character = katakana_list[i]
     # print(character)
     bitmap_data = katakana_font_dict[character]
@@ -46,10 +48,21 @@ for i in range(len(katakana_list)):
                 x = k
                 y = -j - font_size * i
                 z = 0
+                random_num = randint(0, 10)
                 # print(x, y, z)
-                build_box.create_box(x, y, z, r=0, g=1, b=0, alpha=0.8)
+                # build_box.create_box(x, y, z, r=0, g=1, b=0, alpha=1)
+                if random_num < 1:  # 10%の確率で文字を回転
+                    random_num2 = randint(0, 10)
+                    if random_num2 < 3:
+                        build_box.create_box(y, x, z, r=1, g=0, b=0, alpha=1)
+                    elif random_num2 < 7:
+                        build_box.create_box(-x, y, z, r=0, g=1, b=0, alpha=1)
+                    else:
+                        build_box.create_box(x, -y, z, r=0, g=0, b=1, alpha=1)
+                else:
+                    build_box.create_box(x, y, z, r=0, g=1, b=0, alpha=1)
 
-for _ in range(3):
+for _ in range(5):
     x = randint(-50, 50)
     y = randint(0, 100)
     z = randint(-50, 0)
