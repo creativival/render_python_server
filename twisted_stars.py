@@ -6,7 +6,7 @@ room_name = "1000"
 radius = 10
 inner_radius = 5
 angle_num = 5
-height = 200
+height = 100
 
 build_box = BuildBox(room_name)
 build_box.set_box_size(0.3)
@@ -30,6 +30,6 @@ for i in range(angle_num):
 
 for i in range(height):
     rotation_angle = i * 720 / height
-    build_box.translate(0, i, 0, pitch=0, yaw=rotation_angle, roll=0)
+    build_box.translate(0, i * 2, 0, pitch=0, yaw=rotation_angle, roll=0)
     build_box.send_data()
     sleep(1)
