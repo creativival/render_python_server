@@ -1,7 +1,7 @@
 import asyncio
 import datetime
-from math import floor
 import re
+from math import floor
 
 import websockets
 
@@ -9,6 +9,8 @@ from matrix_util import *
 
 
 class BuildBox:
+    texture_names = ["grass", "stone", "dirt", "planks", "bricks"]
+
     def __init__(self, room_name):
         self.room_name = room_name
         self.is_allowed_matrix = 0
@@ -73,11 +75,16 @@ class BuildBox:
         x, y, z = self.round_numbers([x, y, z])
         self.animation = [x, y, z, pitch, yaw, roll, scale, interval]
 
-    def create_box(self, x, y, z, r=1, g=1, b=1, alpha=1):
+    def create_box(self, x, y, z, r=1, g=1, b=1, alpha=1, texture=None):
         x, y, z = self.round_numbers([x, y, z])
         # 重ねておくことを防止
         self.remove_box(x, y, z)
-        self.boxes.append([x, y, z, r, g, b, alpha])
+        if texture is None or texture not in self.texture_names:
+            texture_id = -1
+        else:
+            texture_id = self.texture_names.index(texture)
+
+        self.boxes.append([x, y, z, r, g, b, alpha, texture_id])
 
     def remove_box(self, x, y, z):
         x, y, z = self.round_numbers([x, y, z])
