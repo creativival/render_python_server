@@ -28,6 +28,15 @@ class BuildBox:
         self.roughness = 0.5
         self.is_allowed_float = 0
         self.build_interval = 0.01
+        self.is_framing = False
+        self.frame_id = 0
+
+    def frame_in(self):
+        self.is_framing = True
+
+    def frame_out(self):
+        self.is_framing = False
+        self.frame_id += 1
 
     def push_matrix(self):
         self.is_allowed_matrix += 1
@@ -84,13 +93,24 @@ class BuildBox:
         else:
             texture_id = self.texture_names.index(texture)
 
-        self.boxes.append([x, y, z, r, g, b, alpha, texture_id])
+        if self.is_framing:
+            self.boxes.append([self.frame_id, x, y, z, r, g, b, alpha, texture_id])
+        else:
+            self.boxes.append([x, y, z, r, g, b, alpha, texture_id])
 
     def remove_box(self, x, y, z):
         x, y, z = self.round_numbers([x, y, z])
-        for box in self.boxes:
-            if box[0] == x and box[1] == y and box[2] == z:
-                self.boxes.remove(box)
+
+        if self.is_framing:
+            for box in self.boxes:
+                if len(box) == 9:
+                    if box[0] == self.frame_id and box[1] == x and box[2] == y and box[3] == z:
+                        self.boxes.remove(box)
+        else:
+            for box in self.boxes:
+                if len(box) == 8:
+                    if box[0] == x and box[1] == y and box[2] == z:
+                        self.boxes.remove(box)
 
     def set_box_size(self, box_size):
         self.size = box_size
