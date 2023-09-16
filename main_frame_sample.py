@@ -16,6 +16,7 @@ rainbow_colors = [
     [0, 128, 0],     # 緑
     [0, 255, 255],   # 水色
     [0, 0, 255],     # 青
+    [128, 0, 128],    # 紫
     [128, 0, 128]    # 紫
 ]
 butterfly_list = [
@@ -183,12 +184,15 @@ butterfly_list = [
 
 for angle in [30, 15, 0, -15, -30, -15, 0, 15]:
     build_box.frame_in()
+    build_box.translate(0, 100, 0, 30, 0, 0)
+
     for j, row in enumerate(butterfly_list):
-        color = rainbow_colors[j // 12]
+        color = rainbow_colors[j // 10]
+
         for i, dot in enumerate(row):
             if dot != 0:
                 x = i * cos(radians(angle))
-                y = offset[1] - j
+                y = -j
                 z = i * sin(radians(angle))
                 build_box.create_box(x, y, z, color[0], color[1], color[2])
                 build_box.create_box(-x, y, z, color[0], color[1], color[2])

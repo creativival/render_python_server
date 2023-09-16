@@ -16,9 +16,11 @@ class BuildBox:
         self.is_allowed_matrix = 0
         self.saved_matrices = []
         self.translation = [0, 0, 0, 0, 0, 0]
+        self.frame_translations = []
         self.global_animation = [0, 0, 0, 0, 0, 0, 1, 0]
         self.animation = [0, 0, 0, 0, 0, 0, 1, 0]
         self.boxes = []
+        self.frames = []
         self.sentence = []
         self.lights = []
         self.commands = []
@@ -40,7 +42,11 @@ class BuildBox:
 
     def push_matrix(self):
         self.is_allowed_matrix += 1
-        self.saved_matrices.append(self.translation)
+
+        if self.is_framing:
+            self.saved_matrices.append(self.frame_translations[-1])
+        else:
+            self.saved_matrices.append(self.translation)
 
     def pop_matrix(self):
         self.is_allowed_matrix -= 1
@@ -71,10 +77,19 @@ class BuildBox:
             # 移動後の回転を計算する
             translate_rotation_matrix = get_rotation_matrix(-pitch, -yaw, -roll)  # 逆回転
             rotate_matrix = matrix_multiply(translate_rotation_matrix, base_rotation_matrix)
-            self.translation = [x, y, z, *rotate_matrix[0], *rotate_matrix[1], *rotate_matrix[2]]
+
+            if self.is_framing:
+                self.frame_translations.append(
+                    [x, y, z, *rotate_matrix[0], *rotate_matrix[1], *rotate_matrix[2], self.frame_id])
+            else:
+                self.translation = [x, y, z, *rotate_matrix[0], *rotate_matrix[1], *rotate_matrix[2]]
         else:
             x, y, z = self.round_numbers([x, y, z])
-            self.translation = [x, y, z, pitch, yaw, roll]
+
+            if self.is_framing:
+                self.frame_translations.append([x, y, z, pitch, yaw, roll, self.frame_id])
+            else:
+                self.translation = [x, y, z, pitch, yaw, roll]
 
     def animate_global(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
         x, y, z = self.round_numbers([x, y, z])
@@ -94,7 +109,7 @@ class BuildBox:
             texture_id = self.texture_names.index(texture)
 
         if self.is_framing:
-            self.boxes.append([self.frame_id, x, y, z, r, g, b, alpha, texture_id])
+            self.frames.append([x, y, z, r, g, b, alpha, texture_id, self.frame_id])
         else:
             self.boxes.append([x, y, z, r, g, b, alpha, texture_id])
 
@@ -102,15 +117,13 @@ class BuildBox:
         x, y, z = self.round_numbers([x, y, z])
 
         if self.is_framing:
-            for box in self.boxes:
-                if len(box) == 9:
-                    if box[0] == self.frame_id and box[1] == x and box[2] == y and box[3] == z:
-                        self.boxes.remove(box)
+            for box in self.frames:
+                if box[0] == x and box[1] == y and box[2] == z and box[8] == self.frame_id:
+                    self.frames.remove(box)
         else:
             for box in self.boxes:
-                if len(box) == 8:
-                    if box[0] == x and box[1] == y and box[2] == z:
-                        self.boxes.remove(box)
+                if box[0] == x and box[1] == y and box[2] == z:
+                    self.boxes.remove(box)
 
     def set_box_size(self, box_size):
         self.size = box_size
@@ -119,10 +132,14 @@ class BuildBox:
         self.build_interval = interval
 
     def clear_data(self):
+        self.is_allowed_matrix = 0
+        self.saved_matrices = []
         self.translation = [0, 0, 0, 0, 0, 0]
+        self.frame_translations = []
         self.global_animation = [0, 0, 0, 0, 0, 0, 1, 0]
         self.animation = [0, 0, 0, 0, 0, 0, 1, 0]
         self.boxes = []
+        self.frames = []
         self.sentence = []
         self.lights = []
         self.commands = []
@@ -220,9 +237,11 @@ class BuildBox:
         data_to_send = f"""
       {{
       "translation": {self.translation},
+      "frameTranslations": {self.frame_translations},
       "globalAnimation": {self.global_animation},
       "animation": {self.animation},
       "boxes": {self.boxes},
+      "frames": {self.frames},
       "sentence": {self.sentence},
       "lights": {self.lights},
       "commands": {self.commands},

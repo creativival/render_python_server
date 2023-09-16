@@ -1,7 +1,6 @@
 # ファイル名などに日本語があるとエラーになります。
 # 画像のピクセルごとにBlue(RGBのB)の数値0-255をcsvファイルに出力する。
-
-import os
+# https://qiita.com/gtyksculpt/items/485e8be4c750314e8a9b
 
 import cv2
 import numpy
@@ -16,3 +15,4 @@ data = numpy.array(bgr_array[:, :, 1])
 # [:, :, 1]ならGreen、[:, :, 2]ならRedの数値が出力される。
 
 numpy.savetxt(csv_name, data, fmt="%.0f", delimiter=",")
+# fmt="%.0f"で小数点以下を表示しないようにする。
