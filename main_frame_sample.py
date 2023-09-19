@@ -1,14 +1,6 @@
 from math import sin, cos, radians
 from build_box import BuildBox
 
-# ルームネームを設定
-room_name = "1000"
-build_box = BuildBox(room_name)
-build_box.set_box_size(0.15)
-# build_box.set_build_interval(0.01)
-build_box.set_command('float')
-
-offset = [0, 100, 0]
 rainbow_colors = [
     [255, 0, 0],     # 赤
     [255, 165, 0],   # オレンジ
@@ -182,6 +174,15 @@ butterfly_list = [
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
+# ルームネームを設定
+room_name = "1000"
+build_box = BuildBox(room_name)
+build_box.set_box_size(0.15)
+# build_box.set_build_interval(0.01)
+build_box.set_command('float')
+build_box.set_frame_fps(2)
+build_box.set_frame_repeats(10)
+
 for angle in [30, 15, 0, -15, -30, -15, 0, 15]:
     build_box.frame_in()
     build_box.translate(0, 100, 0, 30, 0, 0)
@@ -194,10 +195,12 @@ for angle in [30, 15, 0, -15, -30, -15, 0, 15]:
                 x = i * cos(radians(angle))
                 y = -j
                 z = i * sin(radians(angle))
-                build_box.create_box(x, y, z, color[0], color[1], color[2])
-                build_box.create_box(-x, y, z, color[0], color[1], color[2])
+                r = color[0] / 255
+                g = color[1] / 255
+                b = color[2] / 255
+                build_box.create_box(x, y, z, r, g, b)
+                build_box.create_box(-x, y, z, r, g, b)
     build_box.frame_out()
 
 # データを送信
 build_box.send_data()
-build_box.clear_data()

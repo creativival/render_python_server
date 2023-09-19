@@ -16,6 +16,7 @@ class BuildBox:
         self.is_allowed_matrix = 0
         self.saved_matrices = []
         self.translation = [0, 0, 0, 0, 0, 0]
+        self.matrix_translation = [0, 0, 0, 0, 0, 0]
         self.frame_translations = []
         self.global_animation = [0, 0, 0, 0, 0, 0, 1, 0]
         self.animation = [0, 0, 0, 0, 0, 0, 1, 0]
@@ -33,6 +34,34 @@ class BuildBox:
         self.is_framing = False
         self.frame_id = 0
 
+    def clear_data(self):
+        self.is_allowed_matrix = 0
+        self.saved_matrices = []
+        self.translation = [0, 0, 0, 0, 0, 0]
+        self.matrix_translation = [0, 0, 0, 0, 0, 0]
+        self.frame_translations = []
+        self.global_animation = [0, 0, 0, 0, 0, 0, 1, 0]
+        self.animation = [0, 0, 0, 0, 0, 0, 1, 0]
+        self.boxes = []
+        self.frames = []
+        self.sentence = []
+        self.lights = []
+        self.commands = []
+        self.size = 1
+        self.shape = 'box'
+        self.is_metallic = 0
+        self.roughness = 0.5
+        self.is_allowed_float = 0
+        self.build_interval = 0.01
+        self.is_framing = False
+        self.frame_id = 0
+
+    def set_frame_fps(self, fps=2):
+        self.commands.append(f'fps {fps}')
+
+    def set_frame_repeats(self, repeats=10):
+        self.commands.append(f'repeats {repeats}')
+
     def frame_in(self):
         self.is_framing = True
 
@@ -42,21 +71,16 @@ class BuildBox:
 
     def push_matrix(self):
         self.is_allowed_matrix += 1
-
-        if self.is_framing:
-            self.saved_matrices.append(self.frame_translations[-1])
-        else:
-            self.saved_matrices.append(self.translation)
+        self.saved_matrices.append(self.matrix_translation)
 
     def pop_matrix(self):
         self.is_allowed_matrix -= 1
-        self.translation = self.saved_matrices.pop()
+        self.matrix_translation = self.saved_matrices.pop()
 
     def translate(self, x, y, z, pitch=0, yaw=0, roll=0):
         if self.is_allowed_matrix:
-            # 保存したマトリックスを取り出す
+            # 移動用のマトリックスを計算する
             matrix = self.saved_matrices[-1]
-            print('before matrix: ', matrix)
             base_position = matrix[:3]
 
             if len(matrix) == 6:
@@ -69,7 +93,8 @@ class BuildBox:
                 ]
 
             # 移動後の位置を計算する
-            add_x, add_y, add_z = transform_point_by_rotation_matrix([x, y, z], transpose_3x3(base_rotation_matrix))  # 転置行列を使用
+            # 転置行列を使用
+            add_x, add_y, add_z = transform_point_by_rotation_matrix([x, y, z], transpose_3x3(base_rotation_matrix))
             print('add_x, add_y, add_z: ', add_x, add_y, add_z)
             x, y, z = add_vectors(base_position, [add_x, add_y, add_z])
             x, y, z = self.round_numbers([x, y, z])
@@ -78,11 +103,7 @@ class BuildBox:
             translate_rotation_matrix = get_rotation_matrix(-pitch, -yaw, -roll)  # 逆回転
             rotate_matrix = matrix_multiply(translate_rotation_matrix, base_rotation_matrix)
 
-            if self.is_framing:
-                self.frame_translations.append(
-                    [x, y, z, *rotate_matrix[0], *rotate_matrix[1], *rotate_matrix[2], self.frame_id])
-            else:
-                self.translation = [x, y, z, *rotate_matrix[0], *rotate_matrix[1], *rotate_matrix[2]]
+            self.matrix_translation = [x, y, z, *rotate_matrix[0], *rotate_matrix[1], *rotate_matrix[2]]
         else:
             x, y, z = self.round_numbers([x, y, z])
 
@@ -91,19 +112,32 @@ class BuildBox:
             else:
                 self.translation = [x, y, z, pitch, yaw, roll]
 
-    def animate_global(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
-        x, y, z = self.round_numbers([x, y, z])
-        self.global_animation = [x, y, z, pitch, yaw, roll, scale, interval]
+    def create_box(self, x, y, z, r=1, g=1, b=1, alpha=1, texture=''):
+        if self.is_allowed_matrix:
+            # 移動用のマトリックスにより位置を計算する
+            matrix_translation = self.matrix_translation
+            base_position = matrix_translation[:3]
 
-    def animate(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
-        x, y, z = self.round_numbers([x, y, z])
-        self.animation = [x, y, z, pitch, yaw, roll, scale, interval]
+            if len(matrix_translation) == 6:
+                base_rotation_matrix = get_rotation_matrix(*matrix_translation[3:])
+            else:
+                base_rotation_matrix = [
+                    matrix_translation[3:6],
+                    matrix_translation[6:9],
+                    matrix_translation[9:12]
+                ]
 
-    def create_box(self, x, y, z, r=1, g=1, b=1, alpha=1, texture=None):
+            # 移動後の位置を計算する
+            # 転置行列を使用
+            add_x, add_y, add_z = transform_point_by_rotation_matrix([x, y, z], transpose_3x3(base_rotation_matrix))
+            x, y, z = add_vectors(base_position, [add_x, add_y, add_z])
+
         x, y, z = self.round_numbers([x, y, z])
+        r, g, b, alpha = self.round_colors([r, g, b, alpha])
+
         # 重ねておくことを防止
         self.remove_box(x, y, z)
-        if texture is None or texture not in self.texture_names:
+        if texture not in self.texture_names:
             texture_id = -1
         else:
             texture_id = self.texture_names.index(texture)
@@ -125,42 +159,31 @@ class BuildBox:
                 if box[0] == x and box[1] == y and box[2] == z:
                     self.boxes.remove(box)
 
+    def animate_global(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
+        x, y, z = self.round_numbers([x, y, z])
+        self.global_animation = [x, y, z, pitch, yaw, roll, scale, interval]
+
+    def animate(self, x, y, z, pitch=0, yaw=0, roll=0, scale=1, interval=10):
+        x, y, z = self.round_numbers([x, y, z])
+        self.animation = [x, y, z, pitch, yaw, roll, scale, interval]
+
     def set_box_size(self, box_size):
         self.size = box_size
 
     def set_build_interval(self, interval):
         self.build_interval = interval
 
-    def clear_data(self):
-        self.is_allowed_matrix = 0
-        self.saved_matrices = []
-        self.translation = [0, 0, 0, 0, 0, 0]
-        self.frame_translations = []
-        self.global_animation = [0, 0, 0, 0, 0, 0, 1, 0]
-        self.animation = [0, 0, 0, 0, 0, 0, 1, 0]
-        self.boxes = []
-        self.frames = []
-        self.sentence = []
-        self.lights = []
-        self.commands = []
-        self.size = 1
-        self.shape = 'box'
-        self.is_metallic = 0
-        self.roughness = 0.5
-        self.is_allowed_float = 0
-        self.build_interval = 0.01
-
     def write_sentence(self, sentence, x, y, z, r=1, g=1, b=1, alpha=1):
-        if self.is_allowed_float:
-            x, y, z = [round(val, 2) for val in [x, y, z]]
-        else:
-            x, y, z = map(floor, [x, y, z])
+        x, y, z = self.round_numbers([x, y, z])
+        r, g, b, alpha = self.round_colors([r, g, b, alpha])
         x, y, z = map(str, [x, y, z])
         r, g, b, alpha = map(str, [r, g, b, alpha])
         self.sentence = [sentence, x, y, z, r, g, b, alpha]
 
     def set_light(self, x, y, z, r=1, g=1, b=1, alpha=1, intensity=1000, interval=1, light_type='point'):
         x, y, z = self.round_numbers([x, y, z])
+        r, g, b, alpha = self.round_colors([r, g, b, alpha])
+
         if light_type == 'point':
             light_type = 1
         elif light_type == 'spot':
@@ -272,3 +295,6 @@ class BuildBox:
             return [round(val, 2) for val in num_list]
         else:
             return map(floor, [round(val, 1) for val in num_list])
+
+    def round_colors(self, num_list):
+         return [round(val, 2) for val in num_list]
