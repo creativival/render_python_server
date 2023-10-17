@@ -7,6 +7,8 @@ build_box = BuildBox(room_name)
 build_box.set_box_size(0.1)
 build_box.set_build_interval(0.01)
 build_box.set_command('float')
+build_box.set_frame_fps(2)
+build_box.set_frame_repeats(10)
 
 # 正多面体を描画
 size = 20
