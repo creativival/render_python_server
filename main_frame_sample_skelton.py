@@ -4,20 +4,20 @@ from build_box import BuildBox
 # ルームネームを設定
 room_name = "1000"
 build_box = BuildBox(room_name)
-build_box.set_box_size(1)
+build_box.set_box_size(0.5)
 build_box.set_build_interval(0.01)
 build_box.set_command('liteRender')
 build_box.set_command('float')
 build_box.set_frame_fps(2)
 build_box.set_frame_repeats(10)
 
-for i in range(1, 10):
+for i in [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2]:
     # フレームイン
     build_box.frame_in()
 
-    build_box.translate(0, 10, 0)
+    build_box.translate(0, 5, 0)
 
-    with open(f'obj_model/whale_animation0{i}.csv') as f:
+    with open(f'obj_model/uploads_files_3207838_SkeletonBase0{i}.csv') as f:
         reader = csv.reader(f)
         next(reader)
         for row in reader:
