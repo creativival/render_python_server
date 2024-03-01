@@ -3,7 +3,7 @@ from build_box import BuildBox
 room_name = "1000"
 build_box = BuildBox(room_name)
 
-build_box.set_box_size(0.3)
+build_box.set_box_size(2)
 build_box.set_build_interval(0.01)
 build_box.translate(0, 0, 0, pitch=0, yaw=0, roll=0)
 build_box.animate(0, 0, 10, pitch=0, yaw=30, roll=0, scale=2, interval= 0)

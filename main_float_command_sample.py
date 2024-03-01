@@ -3,7 +3,7 @@ from math import sin, cos, radians, pi
 from build_box import BuildBox
 
 room_name = "1000"
-size = 1.0
+size = 2
 radius = 1.5 * size
 repeat_count = 100
 

@@ -4,12 +4,14 @@ from build_box import BuildBox
 # ルームネームを設定
 room_name = "1000"
 build_box = BuildBox(room_name)
-build_box.set_box_size(1)
+build_box.set_box_size(0.1)
 build_box.set_build_interval(0.01)
 build_box.set_command('liteRender')
 build_box.set_command('float')
 build_box.set_frame_fps(2)
 build_box.set_frame_repeats(10)
+
+zoom_rate = 10
 
 for i in range(1, 10):
     # フレームイン
@@ -21,7 +23,7 @@ for i in range(1, 10):
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            position = map(lambda x: x * 10, map(float, row))
+            position = map(lambda x: x * zoom_rate, map(float, row))
             build_box.create_box(*position, r=1, g=0, b=1, alpha=1)
 
     # フレームアウト
